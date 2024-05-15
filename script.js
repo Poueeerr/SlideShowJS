@@ -1,5 +1,7 @@
 document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
 
+let slideInterval;
+
 function handleImageUpload(event) {
     const files = event.target.files;
     const slidesContainer = document.getElementById('slides');
@@ -29,6 +31,9 @@ function handleImageUpload(event) {
 
     // Atualiza a largura do contêiner de slides baseado na quantidade de imagens
     slidesContainer.style.width = `${files.length * 100}%`;
+
+    // Atualiza o intervalo de slides
+    startSlideshow();
 }
 
 function navigateToSlide(index) {
@@ -36,12 +41,24 @@ function navigateToSlide(index) {
     slidesContainer.style.marginLeft = `-${index * 100}%`;
 }
 
-// Atualização do intervalo de slides
-let contador = 0;
-setInterval(function() {
-    const slides = document.querySelectorAll('.slide');
-    if (slides.length > 0) {
-        contador = (contador + 1) % slides.length;
-        navigateToSlide(contador);
+function startSlideshow() {
+    const intervalTimeInput = document.getElementById('intervalTime');
+    let intervalTime = parseInt(intervalTimeInput.value) * 1000; // Converte para milissegundos
+
+    if (isNaN(intervalTime) || intervalTime <= 0) {
+        intervalTime = 30000; // Default para 30 segundos se o valor não for válido
     }
-}, 3000);
+
+    clearInterval(slideInterval); // Limpa qualquer intervalo anterior
+
+    let contador = 0;
+    slideInterval = setInterval(function() {
+        const slides = document.querySelectorAll('.slide');
+        if (slides.length > 0) {
+            contador = (contador + 1) % slides.length;
+            navigateToSlide(contador);
+        }
+    }, intervalTime);
+}
+
+document.getElementById('intervalTime').addEventListener('change', startSlideshow);
